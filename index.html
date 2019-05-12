@@ -1,0 +1,50 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>FlappAI</title>
+    <script src="toolbox.min.js"></script>
+    <script src="js/NeuralNetwork/nn.js"></script>
+    <script src="js/NeuralNetwork/ga.js"></script>
+    <script src="js/NeuralNetwork/matrix.js"></script>
+    <script src="js/game/class/Bird.js"></script>
+    <script src="js/game/class/BirdBrain.js"></script>
+    <script src="js/game/class/Pipe.js"></script>
+    <script src="js/game/loop.js"></script>
+    <script src="js/info/draw.loop.js"></script>
+    <style>
+        canvas {
+            background-color: grey;
+        }
+
+        div#info,
+        div#game {
+            position: absolute;
+            width: 50%;
+            height: 100%;
+            padding: 0;
+        }
+
+        div#info {
+            left: 50%;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="game">
+        <canvas id="game" width="600" height="800"></canvas>
+        <input type="range" min="1" max="21" step="2" id="speed">
+    </div>
+    <div id="info">
+        <td>
+            <canvas id="neurons" width="600" height="400"></canvas>
+        </td>
+        <td>
+            <canvas id="graph" width="600" height="400"></canvas>
+        </td>
+    </div>
+    <script src="script.js"></script>
+</body>
+
+</html>
