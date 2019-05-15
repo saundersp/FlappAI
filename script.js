@@ -28,15 +28,15 @@ function getCanvas(name, opt) {
 const keyInput = trackKeys(['ArrowUp']);
 
 const humanGame = false,
-    fastGraphics = false;
+    fastGraphics = true;
 
 //BirdBrain
 const input_nodes = 6;
-const hidden_notes = 4;
+const hidden_notes = 8;
 const output_nodes = 2;
 
 //Bird
-const gravity = 40;
+const gravity = 30;
 const speedY = 600;
 
 //Pipe
@@ -49,14 +49,14 @@ let fps = 0;
 
 let background, bird, pipes, ground, roof;
 //IF IA
-const nbBirds = 250,
-    spaceBetweenPipes = 350;
+const nbBirds = 500,
+    spaceBetweenPipes = 350,
+    mutationRate = 0.25;
 
 let gen = 1,
     bestScore = 0,
     bestBrainYet = new NeuralNetwork(input_nodes, hidden_notes, output_nodes),
     bestScoreYet = 0,
-    worstScoreYet = Infinity,
     nbAlive = 0;
 
 window.onload = _ => {
@@ -68,7 +68,14 @@ window.onload = _ => {
 
     const slider = $("input#speed")[0];
 
-    const game_loop = humanGame ? humain_loop : simulation_loop;
+    let draw_loop, move_loop;
+    if (humanGame) {
+        draw_loop = humain_loop_draw;
+        move_loop = humain_loop_move;
+    } else {
+        draw_loop = simulation_loop_draw;
+        move_loop = simulation_loop_move;
+    }
 
     const loop = currentTime => {
         const delta = currentTime - oldTime;
@@ -85,12 +92,17 @@ window.onload = _ => {
         const it = slider.valueAsNumber;
         let i = 0;
 
-        for (i = 0; i < it; i++)
-            if (game_loop(game, delta) === false)
+        for (i = 0; i < it; i++) {
+            common_loop_move(game, delta);
+            if (move_loop(delta, game.width, game.height) === false)
                 break;
+        }
 
-        if (i === it)
+        if (i === it) {
+            common_loop_draw(game);
+            draw_loop(game);
             requestAnimationFrame(loop);
+        }
     };
     requestAnimationFrame(loop);
     draw_graph(stat, []);

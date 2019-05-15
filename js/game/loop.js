@@ -1,5 +1,4 @@
-function common_loop(game, delta) {
-
+function common_loop_draw(game) {
     const {
         ctx,
         width,
@@ -16,6 +15,13 @@ function common_loop(game, delta) {
 
     ctx.fillStyle = 'black';
     ctx.fillText(`FPS: ${fps}`, 10, height - 10);
+    return game;
+}
+
+function common_loop_move(game, delta) {
+    const {
+        width
+    } = game;
 
     pipes.forEach(pipe => {
         pipe.move(delta);
@@ -24,17 +30,19 @@ function common_loop(game, delta) {
             pipe.reset(width);
         }
     });
-    return game;
 }
 
-function humain_loop(game, delta) {
+function humain_loop_draw(game) {
     const {
         ctx
-    } = common_loop(game, delta);
+    } = game;
 
     ctx.fillText(`Score: ${bird.score}`, 10, 30);
 
     bird.draw(ctx);
+}
+
+function humain_loop_move(delta) {
     bird.move(delta, pipes);
 
     if (keyInput.ArrowUp)
@@ -44,21 +52,29 @@ function humain_loop(game, delta) {
         return false;
 }
 
-function simulation_loop(game, delta) {
+function simulation_loop_draw(game) {
 
     const {
         ctx,
-        width,
         height
-    } = common_loop(game, delta);
+    } = game;
 
     ctx.fillText(`nbAlive: ${nbAlive}`, 440, height - 10);
+
+    bird.forEach(bird => {
+        if (!bird.dead)
+            bird.draw(ctx);
+    });
+
+    ctx.fillText(`Score: ${bestScore}`, 10, 30);
+}
+
+function simulation_loop_move(delta, width, height) {
 
     nbAlive = bird.reduce((n, bird) => {
         if (bird.dead)
             return n;
 
-        bird.draw(ctx);
         bird.move(delta);
 
         if (bird.think(pipes, width, height))
@@ -69,8 +85,6 @@ function simulation_loop(game, delta) {
 
         return n + 1;
     }, 0);
-
-    ctx.fillText(`Score: ${bestScore}`, 10, 30);
 
     if (nbAlive === 0) {
         resetGame(width);

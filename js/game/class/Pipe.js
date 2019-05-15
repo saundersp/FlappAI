@@ -12,8 +12,9 @@ class Pipe extends Rectangle {
     draw(ctx) {
         super.draw(ctx);
         this.bottomPipe.draw(ctx);
-        if (!this.barrier.broke)
-            this.barrier.draw(ctx);
+        if (fastGraphics)
+            if (!this.barrier.broke)
+                this.barrier.draw(ctx);
     }
 
     move(delta) {

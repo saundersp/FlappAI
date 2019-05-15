@@ -2,7 +2,6 @@ function nextGeneration() {
     //Save best scores
     gen++;
     bestScoreYet = max(bestScore, bestScoreYet);
-    worstScoreYet = min(bestScore, worstScoreYet);
     tabscore.push(bestScore);
     draw_graph(stat, tabscore);
     bestScore = 0;
@@ -22,7 +21,7 @@ function nextGeneration() {
         }
         index--;
         let cbird = bird[index];
-        let child = new BirdBrain(cbird.img, cbird.brain);
+        const child = new BirdBrain(cbird.img, cbird.brain);
         child.mutate();
         return child;
     });

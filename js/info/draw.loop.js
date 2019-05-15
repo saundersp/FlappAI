@@ -20,9 +20,9 @@ function draw_neurons(neurons, bestBrainYet) {
     } = bestBrainYet;
 
     const tabNodes = [
-        [input_nodes, ["Y", "vY", "PTH", "PBH", "PdX", "PdW"]],
+        [input_nodes, ["Y", "vY", "PtY", "PbY", "PdX", "PdW"]],
         [hidden_nodes],
-        [output_nodes, ["Flap", "NoFlap"]]
+        [output_nodes, ["Up", "NoUp"]]
     ];
 
     const maxNb = max(...tabNodes.map(n => n[0]));
@@ -89,42 +89,57 @@ function draw_graph(stat, tabscore) {
         len = showN;
     }
 
+    len--;
+
     let {
         avg,
-        maxi
+        maxi,
+        mini
     } = tabscore.reduce((n, o, i) => {
-        if (i >= first)
+        if (i > first) {
             n.maxi = max(n.maxi, o);
+            n.mini = min(n.mini, o);
+        }
         return {
             maxi: n.maxi,
+            mini: n.mini,
             avg: n.avg + o
         };
     }, {
         maxi: 0,
+        mini: Infinity,
         avg: 0
     });
     avg = floor(avg / tabscore.length);
 
-    ctx.strokeStyle = 'white';
-    ctx.beginPath();
-    ctx.moveTo(0, height - tabscore[first] / maxi * height);
-
-    let prevX = 0;
-    let mini = Infinity;
-    for (let i = first; i < tabscore.length; i++) {
+    let prevX = 0,
+        prevY = height - tabscore[first] / maxi * height;
+    for (let i = first + 1; i < tabscore.length; i++) {
         const o = tabscore[i];
+        ctx.beginPath();
+        ctx.strokeStyle = 'white';
+        ctx.moveTo(prevX, prevY);
         prevX += width / len;
-        const y = height - o / maxi * height;
-        ["lineTo", "moveTo"].forEach(t => ctx[t](prevX, y));
-        mini = min(mini, o);
+        prevY = height - o / maxi * height;
+        ctx.lineTo(prevX, prevY);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(prevX, 0);
+        ctx.strokeStyle = '#FFFFFF33';
+        ctx.lineTo(prevX, width);
+        ctx.stroke();
+        ctx.moveTo(prevX, prevY);
     }
     ctx.stroke();
-    ctx.closePath();
 
     ctx.fillStyle = 'white';
     ctx.strokeStyle = 'grey';
     [
         `Gen: ${gen} Avg: ${avg} Best: ${bestScoreYet}`,
         `Max: ${maxi}, Min: ${mini}`
-    ].forEach((o, i) => ["strokeText", "fillText"].forEach(t => ctx[t](o, 30, 30 * (i + 1))));
+    ].forEach((o, i) => {
+        const y = 30 * (i + 1);
+        ctx.strokeText(o, 30, y);
+        ctx.fillText(o, 30, y);
+    });
 }
