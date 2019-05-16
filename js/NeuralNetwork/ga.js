@@ -1,7 +1,11 @@
 function nextGeneration() {
     //Save best scores
     gen++;
-    bestScoreYet = max(bestScore, bestScoreYet);
+    if (bestScore > bestScoreYet) {
+        bestScoreYet = bestScore;
+        bestBrainYet = bird.filter(o => o.score === bestScore)[0].brain.copy();
+        draw_neurons(neu, bestBrainYet);
+    }
     tabscore.push(bestScore);
     draw_graph(stat, tabscore);
     bestScore = 0;

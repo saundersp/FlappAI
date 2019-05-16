@@ -34,4 +34,18 @@ class Bird extends Rectangle {
     flap(delta) {
         this.vY = -calcSpeedFromDelta(delta, speedY);
     }
+
+    draw(ctx) {
+        ctx.save();
+        ctx.translate(this.x + this.w / 2, this.y + this.h / 2);
+        ctx.rotate(constrain(this.vY, -45 * Math.PI / 180, 30 * Math.PI / 180));
+        ctx.translate(-this.w / 2, -this.h / 2);
+        if (this.img)
+            ctx.drawImage(this.img, 0, 0, this.w, this.h);
+        else {
+            ctx.fillStyle = this.c;
+            ctx.fillRect(0, 0, this.w, this.h);
+        }
+        ctx.restore();
+    }
 }

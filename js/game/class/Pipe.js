@@ -32,7 +32,7 @@ class Pipe extends Rectangle {
 
     reset(width) {
         this.x = width;
-        this.barrier.x = width + this.w;
+        this.barrier.x = width + this.w - 1;
         this.barrier.broke = false;
         this.bottomPipe.x = width;
     }

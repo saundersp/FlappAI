@@ -4,8 +4,19 @@ const game = getCanvas('game');
 const stat = getCanvas('graph', {
     showN: 20
 });
+
+//BirdBrain
+const input_nodes = 6;
+const hidden_nodes = 8;
+const output_nodes = 2;
+
 const neu = getCanvas('neurons', {
-    textTopPadding: 5
+    textTopPadding: 5,
+    nodes: [input_nodes, hidden_nodes, output_nodes],
+    labels: [
+        ["Y", "vY", "PtY", "PbY", "PdX", "PdW"],
+        ["Up", "NoUp"]
+    ]
 });
 
 const tabscore = [];
@@ -30,13 +41,8 @@ const keyInput = trackKeys(['ArrowUp']);
 const humanGame = false,
     fastGraphics = true;
 
-//BirdBrain
-const input_nodes = 6;
-const hidden_notes = 8;
-const output_nodes = 2;
-
 //Bird
-const gravity = 30;
+const gravity = 20;
 const speedY = 600;
 
 //Pipe
@@ -49,13 +55,13 @@ let fps = 0;
 
 let background, bird, pipes, ground, roof;
 //IF IA
-const nbBirds = 500,
-    spaceBetweenPipes = 350,
+const nbBirds = 200,
+    spaceBetweenPipes = 400,
     mutationRate = 0.25;
 
 let gen = 1,
     bestScore = 0,
-    bestBrainYet = new NeuralNetwork(input_nodes, hidden_notes, output_nodes),
+    bestBrainYet = new NeuralNetwork(input_nodes, hidden_nodes, output_nodes),
     bestScoreYet = 0,
     nbAlive = 0;
 
@@ -114,7 +120,7 @@ function game_setup(width, height) {
 
     const borderSize = 50;
 
-    roof = new Rectangle(0, -borderSize, width, borderSize, 'gray');
+    roof = new Rectangle(0, -borderSize, width, borderSize, 'grey');
 
     ground = new Rectangle(0, height - borderSize, width, borderSize, 'yellow');
 

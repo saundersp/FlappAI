@@ -3,10 +3,10 @@ function draw_neurons(neurons, bestBrainYet) {
         ctx,
         width,
         height,
-        textTopPadding
+        textTopPadding,
+        nodes,
+        labels
     } = neurons;
-    ctx.textAlign = 'center';
-    ctx.font = "13px arial";
 
     ctx.clearRect(0, 0, width, height);
 
@@ -14,36 +14,40 @@ function draw_neurons(neurons, bestBrainYet) {
     ctx.fillRect(0, 0, width, height);
 
     const {
-        input_nodes,
-        hidden_nodes,
-        output_nodes
+        weights_ho,
+        weights_ih,
+        bias_h,
+        bias_o,
+        learning_rate
     } = bestBrainYet;
 
-    const tabNodes = [
-        [input_nodes, ["Y", "vY", "PtY", "PbY", "PdX", "PdW"]],
-        [hidden_nodes],
-        [output_nodes, ["Up", "NoUp"]]
-    ];
+    ctx.textAlign = 'left';
+    ctx.font = "18px arial";
+    ctx.fillStyle = 'black';
+    ctx.fillText(`Learning rate: ${learning_rate}`, 20, height - 10);
 
-    const maxNb = max(...tabNodes.map(n => n[0]));
+    ctx.font = "13px arial";
+    ctx.textAlign = 'center';
+
+    const maxNb = max(...nodes);
     const rad = height / maxNb / 2.5;
-    const disX = width / (tabNodes.length + 1);
+    const disX = width / (nodes.length + 1);
 
-    tabNodes.forEach((n, i) => {
-        const nodes = n[0] + 1;
+    nodes.forEach((n, i) => {
+        const val = n + 1;
         const x = (i + 1) * disX;
-        const y = height / nodes;
-        for (let j = 1; j < nodes; j++) {
+        const y = height / val;
+        for (let j = 1; j < val; j++) {
             const nY = y * j;
 
             ctx.strokeStyle = 'black';
 
             //Drawing connections
-            if (i < tabNodes.length - 1) {
+            if (i < nodes.length - 1) {
 
-                const nodes = tabNodes[i + 1][0] + 1;
-                const y = height / nodes;
-                for (let k = 1; k < nodes; k++) {
+                const val = nodes[i + 1] + 1;
+                const y = height / val;
+                for (let k = 1; k < val; k++) {
                     ctx.beginPath();
                     ctx.moveTo(x, nY);
                     ctx.lineTo(x + disX, y * k);
@@ -59,9 +63,26 @@ function draw_neurons(neurons, bestBrainYet) {
             ctx.stroke();
 
             //Drawing weight
-            if (n[1]) {
-                ctx.fillStyle = 'black';
-                ctx.fillText(n[1][j - 1], x, nY + textTopPadding);
+            ctx.fillStyle = 'black';
+            let data, weight;
+            switch (i) {
+                case 0: //inputs_nodes
+                    ctx.fillText(labels[0][j - 1], x, nY + textTopPadding);
+                    break;
+
+                case nodes.length - 1: //outputs_nodes
+                    data = weights_ho.data[j - 1];
+                    weight = data.reduce((n, o) => n + o + bias_o.data[j - 1][0], 0) / data.length;
+                    ctx.fillText(weight.toFixed(2), x, nY + textTopPadding);
+                    ctx.fillStyle = 'black';
+                    ctx.fillText(labels[1][j - 1], x + textTopPadding * 10, nY + textTopPadding);
+                    break;
+
+                default: //hidden_nodes
+                    data = weights_ih.data[j - 1];
+                    weight = data.reduce((n, o) => n + o + bias_h.data[j - 1][0], 0) / data.length;
+                    ctx.fillText(weight.toFixed(4), x, nY + textTopPadding);
+                    break;
             }
         }
     });

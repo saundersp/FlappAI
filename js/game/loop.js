@@ -97,7 +97,7 @@ function resetGame(width) {
         const nX = width + i * spaceBetweenPipes;
         p.x = nX;
         p.bottomPipe.x = nX;
-        p.barrier.x = nX + p.w;
+        p.barrier.x = nX + p.w - 1;
         p.barrier.broke = false;
     });
 }
