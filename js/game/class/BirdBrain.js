@@ -44,7 +44,7 @@ class BirdBrain extends Bird {
         // Find the closest pipe
         let closest_dis = Infinity;
         const closest = pipes.reduce((o, p) => {
-            let d = p.x - this.x;
+            let d = p.x + p.w - this.x;
             if (d < closest_dis && d > 0) {
                 o = p;
                 closest_dis = d;

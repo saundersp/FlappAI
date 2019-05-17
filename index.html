@@ -28,13 +28,18 @@
         div#info {
             left: 50%;
         }
+
+        legend#speed {
+            width: 10px;
+        }
     </style>
 </head>
 
 <body>
     <div id="game">
         <canvas id="game" width="600" height="800"></canvas>
-        <input type="range" min="1" max="21" step="2" id="speed" placeholder="1">
+        <input type="range" id="speed" min="0" max="100" step="1" placeholder="1">
+        <legend id="speed">1</legend>
     </div>
     <div id="info">
         <td>

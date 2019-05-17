@@ -24,7 +24,7 @@ function nextGeneration() {
             index++;
         }
         index--;
-        let cbird = bird[index];
+        const cbird = bird[index];
         const child = new BirdBrain(cbird.img, cbird.brain);
         child.mutate();
         return child;

@@ -28,6 +28,7 @@ function draw_neurons(neurons, bestBrainYet) {
 
     ctx.font = "13px arial";
     ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
 
     const maxNb = max(...nodes);
     const rad = height / maxNb / 2.5;
@@ -67,21 +68,21 @@ function draw_neurons(neurons, bestBrainYet) {
             let data, weight;
             switch (i) {
                 case 0: //inputs_nodes
-                    ctx.fillText(labels[0][j - 1], x, nY + textTopPadding);
+                    ctx.fillText(labels[0][j - 1], x, nY);
                     break;
 
                 case nodes.length - 1: //outputs_nodes
                     data = weights_ho.data[j - 1];
                     weight = data.reduce((n, o) => n + o + bias_o.data[j - 1][0], 0) / data.length;
-                    ctx.fillText(weight.toFixed(2), x, nY + textTopPadding);
+                    ctx.fillText(weight.toFixed(2), x, nY);
                     ctx.fillStyle = 'black';
-                    ctx.fillText(labels[1][j - 1], x + textTopPadding * 10, nY + textTopPadding);
+                    ctx.fillText(labels[1][j - 1], x + textTopPadding * 10, nY);
                     break;
 
                 default: //hidden_nodes
                     data = weights_ih.data[j - 1];
                     weight = data.reduce((n, o) => n + o + bias_h.data[j - 1][0], 0) / data.length;
-                    ctx.fillText(weight.toFixed(4), x, nY + textTopPadding);
+                    ctx.fillText(weight.toFixed(4), x, nY);
                     break;
             }
         }

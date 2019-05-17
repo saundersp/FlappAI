@@ -52,6 +52,7 @@ const offset = 1.5;
 const pipe_width = 50;
 
 let fps = 0;
+let speed = 1;
 
 let background, bird, pipes, ground, roof;
 //IF IA
@@ -72,7 +73,10 @@ window.onload = _ => {
         ccfps = 0,
         hf = 0;
 
-    const slider = $("input#speed")[0];
+    $("input#speed")[0].oninput = e => {
+        speed = e.originalTarget.valueAsNumber;
+        $('legend#speed').html(speed);
+    };
 
     let draw_loop, move_loop;
     if (humanGame) {
@@ -95,16 +99,14 @@ window.onload = _ => {
         } else
             hf++;
 
-        const it = slider.valueAsNumber;
         let i = 0;
-
-        for (i = 0; i < it; i++) {
+        for (i = 0; i < speed; i++) {
             common_loop_move(game, delta);
             if (move_loop(delta, game.width, game.height) === false)
                 break;
         }
 
-        if (i === it) {
+        if (i === speed) {
             common_loop_draw(game);
             draw_loop(game);
             requestAnimationFrame(loop);
