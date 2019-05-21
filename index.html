@@ -10,8 +10,9 @@
     <script src="js/game/class/Bird.js"></script>
     <script src="js/game/class/BirdBrain.js"></script>
     <script src="js/game/class/Pipe.js"></script>
-    <script src="js/game/loop.js"></script>
-    <script src="js/info/draw.loop.js"></script>
+    <script src="js/game/draw_loop.js"></script>
+    <script src="js/game/move_loop.js"></script>
+    <script src="js/info/draw_loop.js"></script>
     <style>
         body {
             margin: 0;
@@ -36,6 +37,12 @@
         <canvas id="game" width="600" height="800"></canvas>
         <input type="range" id="speed" min="0" max="100" step="1">
         <legend id="speed">Speed: 1</legend>
+        <h3>Space : pause the game</h3>
+        <h3>(HumanGame) ArrowUp : jump</h3>
+        <h3>(Simulation) ArrowLeft : slow down</h3>
+        <h3>(Simulation) ArrowRight : speed up</h3>
+        <h3>(Simulation) S : save best brain</h3>
+        <h3>(Simulation) G : save all the scores</h3>
     </div>
     <div id="info">
         <td>

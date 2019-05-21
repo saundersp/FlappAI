@@ -9,15 +9,12 @@ class Bird extends Rectangle {
     move(delta, pipes) {
         this.vY += calcSpeedFromDelta(delta, gravity);
 
-        this.vY = constrain(this.vY, -10, 30);
+        this.vY = constrain(this.vY, -10, 50);
 
         this.y += this.vY;
 
         if (collisionBird(this))
             this.dead = true;
-        /*if (collision(bird, ground))
-            bird.y = ground.y - bird.h;*/
-
         else {
             pipes.some(p => {
                 if (!p.barrier.broke)

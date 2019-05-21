@@ -36,7 +36,24 @@ const input_nodes = 6, // => see think method
 //---------------------------------------------------------------------
 
 
-const game = getCanvas('game');
+const game = getCanvas('game', {
+    pausedSpeed: 0,
+    speed: 1,
+    changeSpeed: (opt, s) => {
+        $("input#speed")[0].value = "" + s;
+        opt.speed = s;
+        $('legend#speed').html(`Speed: ${opt.speed}`);
+    },
+    togglePause: (opt) => {
+        if (opt.speed !== 0) {
+            opt.pausedSpeed = opt.speed;
+            opt.changeSpeed(0);
+        } else {
+            opt.changeSpeed(opt.pausedSpeed);
+            opt.pausedSpeed = 0;
+        }
+    }
+});
 const neu = getCanvas('neurons', {
     textLeftPadding: 5,
     nodes: [input_nodes, hidden_nodes, output_nodes],
@@ -45,6 +62,7 @@ const neu = getCanvas('neurons', {
         ["Up", "NoUp"]
     ],
     colorOver: 'aqua',
+    mutationRate: mutationRate,
     coor: [-1, -1],
     onmousemove: (opt, e) => {
         const {
@@ -80,18 +98,19 @@ function getCanvas(name, opt) {
                     break;
 
                 default:
-                    res[r] = opt[r];
+                    if (opt[r] instanceof Function)
+                        res[r] = (...args) => opt[r](res, ...args);
+                    else
+                        res[r] = opt[r];
                     break;
             }
         });
     return res;
 }
 
-// only used in humanGame
-const keyInput = trackKeys(['ArrowUp']);
+const keyInput = trackKeys(['ArrowUp', 'ArrowLeft', 'ArrowRight', 'KeyS', 'KeyG', 'Space']);
 
 let fps = 0;
-let speed = 1;
 
 // Object placeholders
 let background, bird, pipes, ground, roof;
@@ -114,8 +133,8 @@ window.onload = _ => {
     s.value = "1";
 
     s.oninput = e => {
-        speed = e.originalTarget.valueAsNumber;
-        $('legend#speed').html(`Speed: ${speed}`);
+        game.speed = e.target.valueAsNumber;
+        $('legend#speed').html(`Speed: ${game.speed}`);
     };
 
     let draw_loop, move_loop;
@@ -140,18 +159,16 @@ window.onload = _ => {
             hf++;
 
         let i = 0;
-        for (i = 0; i < speed; i++) {
+        for (; i < game.speed; i++) {
             common_loop_move(game, delta);
-            if (move_loop(delta, game.width, game.height) === false)
-                break;
+            move_loop(keyInput, game, delta);
         }
 
-        if (i === speed) {
-            common_loop_draw(game);
-            draw_loop(game);
-            draw_neurons(neu, bestBrainYet);
-            requestAnimationFrame(loop);
-        }
+        checkControls(keyInput, game);
+        common_loop_draw(game);
+        draw_loop(game);
+        draw_neurons(neu, bestBrainYet);
+        requestAnimationFrame(loop);
     };
     requestAnimationFrame(loop);
     draw_graph(stat, []);
@@ -190,4 +207,16 @@ function game_setup(width, height) {
         }
         return p;
     });
+}
+
+function saveBlobAsFile(name, content) {
+    const dl = document.createElement("a");
+    dl.download = name;
+    dl.href = window.URL.createObjectURL(new Blob([content], {
+        type: 'text/plain'
+    }));
+    dl.onclick = event => document.body.removeChild(event.target);
+    dl.style.display = "none";
+    document.body.appendChild(dl);
+    dl.click();
 }

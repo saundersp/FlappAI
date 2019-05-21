@@ -4,6 +4,7 @@ function draw_neurons(neurons, bestBrainYet) {
         width,
         height,
         textLeftPadding,
+        mutationRate,
         nodes,
         labels,
         coor,
@@ -28,7 +29,8 @@ function draw_neurons(neurons, bestBrainYet) {
     ctx.textAlign = 'left';
     ctx.font = "18px arial";
     ctx.fillStyle = 'black';
-    ctx.fillText(`Learning rate: ${learning_rate}`, 20, height - 10);
+    ctx.fillText(`Learning rate: ${learning_rate}`, 10, height - 12);
+    ctx.fillText(`Mutation rate: ${mutationRate}`, width - 160, height - 12);
 
     ctx.font = "13px arial";
     ctx.textAlign = 'center';
