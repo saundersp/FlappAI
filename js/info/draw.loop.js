@@ -3,10 +3,14 @@ function draw_neurons(neurons, bestBrainYet) {
         ctx,
         width,
         height,
-        textTopPadding,
+        textLeftPadding,
         nodes,
-        labels
+        labels,
+        coor,
+        colorOver
     } = neurons;
+
+    const isOver = !arrayEqual(coor, [-1, -1]);
 
     ctx.clearRect(0, 0, width, height);
 
@@ -42,6 +46,22 @@ function draw_neurons(neurons, bestBrainYet) {
             const nY = y * j;
 
             ctx.strokeStyle = 'black';
+            ctx.fillStyle = 'white';
+
+            if (isOver && collision({
+                    x: coor[0],
+                    y: coor[1],
+                    w: 0,
+                    h: 0
+                }, {
+                    x: x - rad,
+                    y: nY - rad,
+                    w: rad * 2.4,
+                    h: rad * 2
+                })) {
+                ctx.fillStyle = colorOver;
+                ctx.strokeStyle = colorOver;
+            }
 
             //Drawing connections
             if (i < nodes.length - 1) {
@@ -57,7 +77,7 @@ function draw_neurons(neurons, bestBrainYet) {
             }
 
             //Drawing cells
-            ctx.fillStyle = 'white';
+
             ctx.beginPath();
             ctx.ellipse(x, nY, rad * 1.2, rad, 0, 0, 2 * Math.PI);
             ctx.fill();
@@ -72,21 +92,35 @@ function draw_neurons(neurons, bestBrainYet) {
                     break;
 
                 case nodes.length - 1: //outputs_nodes
-                    data = weights_ho.data[j - 1];
-                    weight = data.reduce((n, o) => n + o + bias_o.data[j - 1][0], 0) / data.length;
-                    ctx.fillText(weight.toFixed(2), x, nY);
+
+                    //Drawing total of connections weights
+                    if (!isOver) {
+                        data = weights_ho.data[j - 1];
+                        weight = data.reduce((n, o) => n + o + bias_o.data[j - 1][0], 0) / data.length;
+                        ctx.fillText(weight.toFixed(2), x, nY);
+                    }
+
                     ctx.fillStyle = 'black';
-                    ctx.fillText(labels[1][j - 1], x + textTopPadding * 10, nY);
+                    ctx.fillText(labels[1][j - 1], x + textLeftPadding * 10, nY);
                     break;
 
                 default: //hidden_nodes
-                    data = weights_ih.data[j - 1];
-                    weight = data.reduce((n, o) => n + o + bias_h.data[j - 1][0], 0) / data.length;
-                    ctx.fillText(weight.toFixed(4), x, nY);
+
+                    //Drawing total of connections weights
+                    if (!isOver) {
+                        data = weights_ih.data[j - 1];
+                        weight = data.reduce((n, o) => n + o + bias_h.data[j - 1][0], 0) / data.length;
+                        ctx.fillText(weight.toFixed(4), x, nY);
+                    }
+
                     break;
             }
         }
     });
+}
+
+function arrayEqual(t1, t2) {
+    return t1.length === t1.length && t1.every((o, i) => o === t2[i]);
 }
 
 function draw_graph(stat, tabscore) {
@@ -94,7 +128,9 @@ function draw_graph(stat, tabscore) {
         ctx,
         width,
         height,
-        showN
+        showN,
+        lineWidth,
+        pointSize
     } = stat;
 
     ctx.clearRect(0, 0, width, height);
@@ -132,7 +168,11 @@ function draw_graph(stat, tabscore) {
         mini: Infinity,
         avg: 0
     });
+    const moy = (maxi - mini) / 2;
     avg = floor(avg / tabscore.length);
+
+    ctx.lineWidth = lineWidth;
+    ctx.fillStyle = 'white';
 
     let prevX = 0,
         prevY = height - tabscore[first] / maxi * height;
@@ -140,25 +180,35 @@ function draw_graph(stat, tabscore) {
         const o = tabscore[i];
         ctx.beginPath();
         ctx.strokeStyle = 'white';
+        ctx.arc(prevX, prevY, pointSize, 0, 2 * Math.PI);
+        ctx.fill();
         ctx.moveTo(prevX, prevY);
         prevX += width / len;
         prevY = height - o / maxi * height;
         ctx.lineTo(prevX, prevY);
         ctx.stroke();
+
         ctx.beginPath();
         ctx.moveTo(prevX, 0);
         ctx.strokeStyle = '#FFFFFF33';
         ctx.lineTo(prevX, width);
         ctx.stroke();
+
         ctx.moveTo(prevX, prevY);
     }
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.moveTo(0, height / 2);
+    ctx.strokeStyle = '#FFFFFF33';
+    ctx.lineTo(width, height / 2);
     ctx.stroke();
 
     ctx.fillStyle = 'white';
     ctx.strokeStyle = 'grey';
     [
-        `Gen: ${gen} Avg: ${avg} Best: ${bestScoreYet}`,
-        `Max: ${maxi}, Min: ${mini}`
+        `Generation: ${gen} Average: ${avg} Best ever: ${bestScoreYet}`,
+        `Maximum: ${maxi}, Middle: ${moy} Minimum: ${mini}`
     ].forEach((o, i) => {
         const y = 30 * (i + 1);
         ctx.strokeText(o, 30, y);

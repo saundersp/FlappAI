@@ -5,10 +5,12 @@ class BirdBrain extends Bird {
         this.img = img;
 
         this.fitness = 0;
-        if (brain) {
+        if (brain)
             this.brain = brain.copy();
-        } else
+        else {
             this.brain = new NeuralNetwork(input_nodes, hidden_nodes, output_nodes);
+            this.brain.setLearningRate(learningRate);
+        }
     }
 
     move(delta) {

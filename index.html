@@ -13,24 +13,20 @@
     <script src="js/game/loop.js"></script>
     <script src="js/info/draw.loop.js"></script>
     <style>
-        canvas {
-            background-color: grey;
+        body {
+            margin: 0;
         }
 
         div#info,
         div#game {
             position: absolute;
-            width: 50%;
             height: 100%;
+            width: 600px;
             padding: 0;
         }
 
         div#info {
-            left: 50%;
-        }
-
-        legend#speed {
-            width: 10px;
+            left: 600px;
         }
     </style>
 </head>
@@ -38,8 +34,8 @@
 <body>
     <div id="game">
         <canvas id="game" width="600" height="800"></canvas>
-        <input type="range" id="speed" min="0" max="100" step="1" placeholder="1">
-        <legend id="speed">1</legend>
+        <input type="range" id="speed" min="0" max="100" step="1">
+        <legend id="speed">Speed: 1</legend>
     </div>
     <div id="info">
         <td>

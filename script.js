@@ -1,65 +1,102 @@
-"use strict";
+//---------------------------------------------------------------------
+// Options you can tweak
+// Enable classic game playable by human
+const humanGame = false;
+// Enable faster graphics (no images just ugly rectangles)
+const fastGraphics = false;
 
-const game = getCanvas('game');
+// Bird
+const gravity = 20,
+    speedY = 600;
+
+// Pipe
+const space = 180, // Space between top and bottom pipe
+    spaceBetweenPipes = 350,
+    pipe_speed = 300, // Horizontal speed
+    offset = 1.5, // Level of height tolerance
+    pipe_width = 50;
+
 const stat = getCanvas('graph', {
-    showN: 20
+    showN: 20, // Show last 20 scores
+    lineWidth: 1.2,
+    pointSize: 3
 });
 
-//BirdBrain
-const input_nodes = 6;
-const hidden_nodes = 8;
-const output_nodes = 2;
+// Options AI (neat)
+const nbBirds = 200, // Density of population
+    mutationRate = 0.25,
+    learningRate = 0.1;
 
+// BirdBrain
+const input_nodes = 6, // => see think method
+    hidden_nodes = 8, // Tweakable
+    output_nodes = 2; // Jump or NoJump
+
+// End options
+//---------------------------------------------------------------------
+
+
+const game = getCanvas('game');
 const neu = getCanvas('neurons', {
-    textTopPadding: 5,
+    textLeftPadding: 5,
     nodes: [input_nodes, hidden_nodes, output_nodes],
     labels: [
         ["Y", "vY", "PtY", "PbY", "PdX", "PdW"],
         ["Up", "NoUp"]
-    ]
+    ],
+    colorOver: 'aqua',
+    coor: [-1, -1],
+    onmousemove: (opt, e) => {
+        const {
+            left,
+            top
+        } = opt.canvas.getBoundingClientRect();
+        opt.coor = [
+            e.clientX - left,
+            e.clientY - top
+        ];
+    },
+    onmouseleave: opt => opt.coor = [-1, -1]
 });
 
 const tabscore = [];
 
 function getCanvas(name, opt) {
-    const canvas = $('canvas#' + name)[0];
+    const canvas = $(`canvas#${name}`)[0];
     const res = {
+        canvas: canvas,
         ctx: canvas.getContext('2d'),
         width: canvas.width,
         height: canvas.height
     };
 
     if (opt)
-        Object.keys(opt).forEach(r => res[r] = opt[r]);
+        Object.keys(opt).forEach(r => {
+            switch (r) {
+                case 'onmousemove':
+                case 'onmousedown':
+                case 'onmouseleave':
+                    canvas[r] = e => opt[r](res, e);
+                    break;
 
+                default:
+                    res[r] = opt[r];
+                    break;
+            }
+        });
     return res;
 }
 
-//only used in humanGame
+// only used in humanGame
 const keyInput = trackKeys(['ArrowUp']);
-
-const humanGame = false,
-    fastGraphics = true;
-
-//Bird
-const gravity = 20;
-const speedY = 600;
-
-//Pipe
-const space = 180;
-const pipe_speed = 300;
-const offset = 1.5;
-const pipe_width = 50;
 
 let fps = 0;
 let speed = 1;
 
+// Object placeholders
 let background, bird, pipes, ground, roof;
-//IF IA
-const nbBirds = 200,
-    spaceBetweenPipes = 400,
-    mutationRate = 0.25;
 
+// Stats...
 let gen = 1,
     bestScore = 0,
     bestBrainYet = new NeuralNetwork(input_nodes, hidden_nodes, output_nodes),
@@ -73,9 +110,12 @@ window.onload = _ => {
         ccfps = 0,
         hf = 0;
 
-    $("input#speed")[0].oninput = e => {
+    const s = $("input#speed")[0];
+    s.value = "1";
+
+    s.oninput = e => {
         speed = e.originalTarget.valueAsNumber;
-        $('legend#speed').html(speed);
+        $('legend#speed').html(`Speed: ${speed}`);
     };
 
     let draw_loop, move_loop;
@@ -109,12 +149,12 @@ window.onload = _ => {
         if (i === speed) {
             common_loop_draw(game);
             draw_loop(game);
+            draw_neurons(neu, bestBrainYet);
             requestAnimationFrame(loop);
         }
     };
     requestAnimationFrame(loop);
     draw_graph(stat, []);
-    draw_neurons(neu, bestBrainYet);
 };
 
 function game_setup(width, height) {
@@ -145,8 +185,8 @@ function game_setup(width, height) {
     pipes = generateArray(2).map((_, i) => {
         const p = new Pipe(width + i * spaceBetweenPipes, height);
         if (!fastGraphics) {
-            loadImage(p, 'images/full pipe top.png');
-            loadImage(p.bottomPipe, 'images/full pipe bottom.png');
+            loadImage(p, 'images/full_pipe_top.png');
+            loadImage(p.bottomPipe, 'images/full_pipe_bottom.png');
         }
         return p;
     });
