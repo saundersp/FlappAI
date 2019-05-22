@@ -3,7 +3,7 @@
 // Enable classic game playable by human
 const humanGame = false;
 // Enable faster graphics (no images just ugly rectangles)
-const fastGraphics = true;
+const fastGraphics = false;
 
 // Bird
 const gravity = 40,
@@ -62,6 +62,8 @@ const neu = getCanvas('neurons', {
         ["Up", "NoUp"]
     ],
     colorOver: 'aqua',
+    colorConnection: 'rgba(0,0,0,0.5)',
+    floatPrecision: 4,
     mutationRate: mutationRate,
     coor: [-1, -1],
     onmousemove: (opt, e) => {
