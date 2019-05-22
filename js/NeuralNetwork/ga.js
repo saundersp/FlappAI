@@ -9,6 +9,9 @@ function nextGeneration() {
     draw_graph(stat, tabscore);
     bestScore = 0;
 
+    if (game.adapSpeed)
+        game.changeSpeed(1);
+
     //calculate fitness
     const sum = bird.reduce((n, b) => n + b.score, 0);
     bird.forEach(b => b.fitness = b.score / sum);

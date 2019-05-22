@@ -35,8 +35,10 @@
 <body>
     <div id="game">
         <canvas id="game" width="600" height="800"></canvas>
-        <input type="range" id="speed" min="0" max="100" step="1">
-        <legend id="speed">Speed: 1</legend>
+        <legend id="speed" for="speed">Speed: 1</legend>
+        <input type="range" id="speed" name="speed" min="0" max="100" step="1">
+        Adaptative speed
+        <input type="checkbox" id="adapSpeed" name="adapSpeed">
         <h3>Space : pause the game</h3>
         <h3>(HumanGame) ArrowUp : jump</h3>
         <h3>(Simulation) ArrowLeft : slow down</h3>

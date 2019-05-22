@@ -1,9 +1,11 @@
 class Bird extends Rectangle {
-    constructor() {
+    constructor(img) {
         super(100, 300, 40, 30, 'rgba(0, 100, 100, 0.5)');
         this.vY = 0;
         this.dead = false;
         this.score = 0;
+        if (img)
+            this.img = img;
     }
 
     move(delta, pipes) {

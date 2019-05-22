@@ -1,10 +1,6 @@
 function checkControls(keyInput, game) {
-    const {
-        togglePause
-    } = game;
-
     if (keyInput.Space) {
-        togglePause();
+        game.togglePause();
         keyInput.Space = false;
     }
 }
@@ -32,7 +28,7 @@ function humain_loop_move(keyInput, game, delta) {
 
     if (bird.dead) {
         resetGame(width);
-        bird = new Bird();
+        bird = new Bird(bird.img);
     }
 }
 

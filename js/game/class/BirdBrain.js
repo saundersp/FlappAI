@@ -1,8 +1,6 @@
 class BirdBrain extends Bird {
     constructor(img, brain) {
-        super();
-
-        this.img = img;
+        super(img);
 
         this.fitness = 0;
         if (brain)
