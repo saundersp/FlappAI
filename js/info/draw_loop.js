@@ -155,10 +155,6 @@ function strokeLineText(ctx, strokeColor, text, x, y, nX, nY) {
     ctx.restore();
 }
 
-function arrayEqual(t1, t2) {
-    return t1.length === t1.length && t1.every((o, i) => o === t2[i]);
-}
-
 function draw_graph(stat, tabscore) {
     const {
         ctx,
