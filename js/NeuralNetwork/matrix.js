@@ -2,7 +2,7 @@ class Matrix {
     constructor(rows, cols) {
         this.rows = rows;
         this.cols = cols;
-        this.data = Array(this.rows).fill(0).map(_ => Array(this.cols).fill(0));
+        this.data = generateArray(this.rows, this.cols);
     }
 
     copy() {
@@ -19,14 +19,11 @@ class Matrix {
 
     static subtract(a, b) {
         if (a.rows !== b.rows ||
-            a.cols !== b.cols) {
-            console.log('Columns and Rows of A must match Columns and Rows of B.');
-            return;
-        }
+            a.cols !== b.cols)
+            throw 'Columns and Rows of A must match Columns and Rows of B.';
 
         // Return a new Matrix a-b
-        return new Matrix(a.rows, a.cols)
-            .map((_, i, j) => a.data[i][j] - b.data[i][j]);
+        return new Matrix(a.rows, a.cols).map((_, i, j) => a.data[i][j] - b.data[i][j]);
     }
 
     toArray() {
@@ -42,10 +39,9 @@ class Matrix {
     add(n) {
         if (n instanceof Matrix) {
             if (this.rows !== n.rows ||
-                this.cols !== n.cols) {
-                console.log('Columns and Rows of A must match Columns and Rows of B.');
-                return;
-            }
+                this.cols !== n.cols)
+                throw 'Columns and Rows of A must match Columns and Rows of B.';
+
             return this.map((e, i, j) => e + n.data[i][j]);
         } else
             return this.map(e => e + n);
@@ -58,10 +54,8 @@ class Matrix {
 
     static multiply(a, b) {
         // Matrix product
-        if (a.cols !== b.rows) {
-            console.log('Columns of A must match rows of B.')
-            return;
-        }
+        if (a.cols !== b.rows)
+            throw 'Columns of A must match rows of B.';
 
         return new Matrix(a.rows, b.cols)
             .map((_, i, j) => {
@@ -76,10 +70,8 @@ class Matrix {
     multiply(n) {
         if (n instanceof Matrix) {
             if (this.rows !== n.rows ||
-                this.cols !== n.cols) {
-                console.log('Columns and Rows of A must match Columns and Rows of B.');
-                return;
-            }
+                this.cols !== n.cols)
+                throw ('Columns and Rows of A must match Columns and Rows of B.');
 
             // hadamard product
             return this.map((e, i, j) => e * n.data[i][j]);
@@ -112,8 +104,9 @@ class Matrix {
     }
 
     static deserialize(data) {
-        if (typeof data == 'string')
+        if (typeof data === 'string')
             data = JSON.parse(data);
+
         const matrix = new Matrix(data.rows, data.cols);
         matrix.data = data.data;
         return matrix;

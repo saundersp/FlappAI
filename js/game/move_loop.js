@@ -21,10 +21,8 @@ function humain_loop_move(keyInput, game, delta) {
 
     bird.move(delta, pipes);
 
-    if (keyInput.ArrowUp) {
+    if (keyInput.ArrowUp)
         bird.flap(delta);
-        keyInput.ArrowUp = false;
-    }
 
     if (bird.dead) {
         resetGame(width);
@@ -38,18 +36,22 @@ function simulation_loop_move(keyInput, game, delta) {
         width,
         height,
         speed,
+        maxSpeed,
+        adapSpeed,
         changeSpeed
     } = game;
 
-    if (keyInput.ArrowRight) {
-        if (speed < 100)
-            changeSpeed(speed + 1);
-        keyInput.ArrowRight = false;
-    }
-    if (keyInput.ArrowLeft) {
-        if (speed > 1)
-            changeSpeed(speed - 1);
-        keyInput.ArrowLeft = false;
+    if (!adapSpeed) {
+        if (keyInput.ArrowRight) {
+            if (speed < maxSpeed)
+                changeSpeed(speed + 1);
+            keyInput.ArrowRight = false;
+        }
+        if (keyInput.ArrowLeft) {
+            if (speed > 1)
+                changeSpeed(speed - 1);
+            keyInput.ArrowLeft = false;
+        }
     }
     if (keyInput.KeyS) {
         saveBlobAsFile("bestBrainYet.json", bestBrainYet.serialize());
@@ -82,9 +84,9 @@ function simulation_loop_move(keyInput, game, delta) {
 }
 
 function collisionBird(b) {
-    return collision(b, [roof, ground]) || collision(b, pipes.reduce((t, p) => {
+    return collision(b, [roof, ground].concat(pipes.reduce((t, p) => {
         t.push(p);
         t.push(p.bottomPipe);
         return t;
-    }, []));
+    }, [])));
 }

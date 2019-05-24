@@ -23,7 +23,7 @@ function humain_loop_draw(game) {
         ctx
     } = game;
 
-    ctx.fillText(`Score: ${bird.score}`, 10, 30);
+    ctx.fillText(`Score: ${bird.score.toLocaleString()}`, 10, 30);
 
     bird.draw(ctx);
 }
@@ -42,7 +42,7 @@ function simulation_loop_draw(game) {
             bird.draw(ctx);
     });
 
-    ctx.fillText(`Score: ${bestScore}`, 10, 30);
+    ctx.fillText(`Score: ${bestScore.toLocaleString()}`, 10, 30);
 }
 
 function resetGame(width) {

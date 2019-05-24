@@ -9,7 +9,7 @@ function nextGeneration() {
     draw_graph(stat, tabscore);
     bestScore = 0;
 
-    if (game.adapSpeed)
+    if (game.adapSpeed && !humanGame)
         game.changeSpeed(1);
 
     //calculate fitness

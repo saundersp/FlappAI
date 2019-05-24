@@ -6,7 +6,7 @@ class BirdBrain extends Bird {
         if (brain)
             this.brain = brain.copy();
         else {
-            this.brain = new NeuralNetwork(input_nodes, hidden_nodes, output_nodes);
+            this.brain = new NeuralNetwork(nodes);
             this.brain.setLearningRate(learningRate);
         }
     }

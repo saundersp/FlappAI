@@ -5,11 +5,9 @@ function draw_neurons(neurons, bestBrainYet) {
         height,
         textLeftPadding,
         mutationRate,
-        nodes,
         labels,
         coor,
         colorOver,
-        colorConnection,
         floatPrecision
     } = neurons;
 
@@ -26,10 +24,9 @@ function draw_neurons(neurons, bestBrainYet) {
     ctx.fillRect(0, 0, width, height);
 
     const {
-        weights_ho,
-        weights_ih,
-        bias_h,
-        bias_o,
+        info,
+        weights,
+        bias,
         learning_rate
     } = bestBrainYet;
 
@@ -43,11 +40,11 @@ function draw_neurons(neurons, bestBrainYet) {
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
 
-    const maxNb = max(...nodes);
+    const maxNb = max(...info);
     const rad = height / maxNb / 2.5;
-    const disX = width / (nodes.length + 1);
+    const disX = width / (info.length + 1);
 
-    nodes.forEach((n, i) => {
+    info.forEach((n, i) => {
         const val = n + 1;
         const x = (i + 1) * disX;
         const y = height / val;
@@ -62,8 +59,8 @@ function draw_neurons(neurons, bestBrainYet) {
             });
 
             //Drawing connections
-            if (i < nodes.length - 1) {
-                const val = nodes[i + 1] + 1;
+            if (i < info.length - 1) {
+                const val = info[i + 1] + 1;
                 const y = height / val;
                 for (let k = 1; k < val; k++) {
                     const coor = [x + disX, y * k];
@@ -73,12 +70,12 @@ function draw_neurons(neurons, bestBrainYet) {
                             w: rad * 2.4,
                             h: rad * 2
                         }))
-                        strokeLineText(ctx, colorOver, (i === 0 ? weights_ih : weights_ho).data[k - 1][j - 1].toFixed(floatPrecision), ...[x, nY], ...coor);
+                        strokeLineText(ctx, colorOver, weights[i].data[k - 1][j - 1].toFixed(floatPrecision), ...[x, nY], ...coor);
                     else {
                         ctx.beginPath();
                         ctx.moveTo(x, nY);
                         ctx.lineTo(...coor);
-                        ctx.strokeStyle = colorConnection;
+                        ctx.strokeStyle = colliMouse ? 'rgba(0,0,0,0.2)' : 'black';
                         ctx.stroke();
                     }
                 }
@@ -96,38 +93,19 @@ function draw_neurons(neurons, bestBrainYet) {
 
             //Drawing weight
             ctx.fillStyle = 'black';
-            let data, weight;
             switch (i) {
-                case 0: //inputs_nodes
+                case 0: // inputs
                     ctx.fillText(labels[0][j - 1], x, nY);
                     break;
 
-                case nodes.length - 1: //outputs_nodes
-
-                    //Drawing total of connections weights
-                    if (!overCell) {
-                        data = weights_ho.data[j - 1];
-                        weight = data.reduce((n, o) => n + o + bias_o.data[j - 1][0], 0) / data.length;
-                    } else
-                        weight = bias_o.data[j - 1][0];
-
-                    ctx.fillText(weight.toFixed(floatPrecision), x, nY);
-
+                case info.length - 1: // outputs
+                    ctx.fillText(bias[i - 1].data[j - 1][0].toFixed(floatPrecision), x, nY);
                     ctx.fillStyle = 'black';
-                    ctx.fillText(labels[1][j - 1], x + textLeftPadding * 10, nY);
+                    ctx.fillText(labels[1][j - 1], x + textLeftPadding, nY);
                     break;
 
-                default: //hidden_nodes
-
-                    //Drawing total of connections weights
-                    if (!overCell) {
-                        data = weights_ih.data[j - 1];
-                        weight = data.reduce((n, o) => n + o + bias_h.data[j - 1][0], 0) / data.length;
-                    } else
-                        weight = bias_h.data[j - 1][0];
-
-                    ctx.fillText(weight.toFixed(floatPrecision), x, nY);
-
+                default: // hidden
+                    ctx.fillText(bias[i - 1].data[j - 1][0].toFixed(floatPrecision), x, nY);
                     break;
             }
         }
@@ -143,13 +121,14 @@ function strokeLineText(ctx, strokeColor, text, x, y, nX, nY) {
     ctx.beginPath();
     ctx.moveTo(x, y);
     ctx.lineTo(nX, nY);
-    ctx.strokeStyle = strokeColor;
+    ctx.strokeStyle = strokeColor + '88';
     ctx.stroke();
 
     ctx.save();
     ctx.translate(...disV);
-    ctx.strokeStyle = strokeColor;
-    ctx.fillStyle = strokeColor;
+    ctx.rotate(Math.atan2(nY - y, nX - x));
+    ctx.strokeStyle = strokeColor + 'FF';
+    ctx.fillStyle = strokeColor + 'FF';
     ctx.strokeText(text, 0, 0);
     ctx.fillText(text, 0, 0);
     ctx.restore();
@@ -239,8 +218,8 @@ function draw_graph(stat, tabscore) {
     ctx.fillStyle = 'white';
     ctx.strokeStyle = 'grey';
     [
-        `Generation: ${gen} Average: ${avg} Best ever: ${bestScoreYet}`,
-        `Maximum: ${maxi}, Middle: ${moy} Minimum: ${mini}`
+        `Generation: ${gen} Average: ${avg.toLocaleString()} Best ever: ${bestScoreYet.toLocaleString()}`,
+        `Maximum: ${maxi.toLocaleString()}, Middle: ${moy.toLocaleString()} Minimum: ${mini.toLocaleString()}`
     ].forEach((o, i) => {
         const y = 30 * (i + 1);
         ctx.strokeText(o, 30, y);

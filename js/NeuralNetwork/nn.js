@@ -1,77 +1,57 @@
-class ActivationFunction {
-    constructor(func, dfunc, name) {
-        this.func = func;
-        this.dfunc = dfunc;
-        this.name = name;
-    }
-
-    serialize() {
-        return this.name;
-    }
-}
-
-const sigmoid = new ActivationFunction(
-    x => 1 / (1 + Math.exp(-x)),
-    y => y * (1 - y),
-    "sigmoid"
-);
-
-const tanh = new ActivationFunction(
-    x => Math.tanh(x),
-    y => 1 - Math.pow(y, 2),
-    "tanh"
-);
+const [sigmoid, tanh] = [
+    [
+        x => 1 / (1 + Math.exp(-x)),
+        y => y * (1 - y),
+        "sigmoid"
+    ],
+    [
+        x => Math.tanh(x),
+        y => 1 - Math.pow(y, 2),
+        "tanh"
+    ]
+].map(o => {
+    return {
+        func: o[0],
+        dfunc: o[1],
+        name: o[3],
+        serialize: _ => o[3]
+    };
+});
 
 class NeuralNetwork {
-    constructor(a, b, c) {
-        if (a instanceof NeuralNetwork) {
-            this.input_nodes = a.input_nodes;
-            this.hidden_nodes = a.hidden_nodes;
-            this.output_nodes = a.output_nodes;
-
-            this.weights_ih = a.weights_ih.copy();
-            this.weights_ho = a.weights_ho.copy();
-
-            this.bias_h = a.bias_h.copy();
-            this.bias_o = a.bias_o.copy();
-
-            this.learning_rate = a.learning_rate;
-            this.activation_function = a.activation_function;
+    constructor(neurons) {
+        if (neurons instanceof NeuralNetwork) {
+            this.info = neurons.info;
+            this.weights = neurons.weights.map(w => w.copy());
+            this.bias = neurons.bias.map(b => b.copy());
+            this.setLearningRate(neurons.learning_rate);
+            this.setActivationFunction(neurons.activation_function);
         } else {
-            this.input_nodes = a;
-            this.hidden_nodes = b;
-            this.output_nodes = c;
+            if (neurons.length < 2)
+                throw "not enough neurons";
 
-            this.weights_ih = new Matrix(this.hidden_nodes, this.input_nodes);
-            this.weights_ho = new Matrix(this.output_nodes, this.hidden_nodes);
-            this.weights_ih.randomize();
-            this.weights_ho.randomize();
-
-            this.bias_h = new Matrix(this.hidden_nodes, 1);
-            this.bias_o = new Matrix(this.output_nodes, 1);
-            this.bias_h.randomize();
-            this.bias_o.randomize();
-
+            this.info = neurons;
+            this.weights = [];
+            this.bias = [];
+            for (let i = 0; i < neurons.length - 1; i++) {
+                this.weights.push(new Matrix(neurons[i + 1], neurons[i]));
+                this.weights[i].randomize();
+                this.bias.push(new Matrix(neurons[i + 1], 1));
+                this.bias[i].randomize();
+            }
             this.setLearningRate();
             this.setActivationFunction();
         }
     }
 
     predict(input_array) {
-        // Generating the Hidden Outputs
-        const inputs = Matrix.fromArray(input_array);
-        const hidden = Matrix.multiply(this.weights_ih, inputs);
-        hidden.add(this.bias_h);
-        // activation function!
-        hidden.map(this.activation_function.func);
-
-        // Generating the output's output!
-        const output = Matrix.multiply(this.weights_ho, hidden);
-        output.add(this.bias_o);
-        output.map(this.activation_function.func);
-
-        // Sending back to the caller!
-        return output.toArray();
+        let last = Matrix.fromArray(input_array);
+        for (let i = 0; i < this.weights.length; i++) {
+            last = Matrix.multiply(this.weights[i], last);
+            last.add(this.bias[i]);
+            last.map(this.activation_function.func);
+        }
+        return last.toArray();
     }
 
     setLearningRate(learning_rate = 0.1) {
@@ -82,7 +62,8 @@ class NeuralNetwork {
         this.activation_function = func;
     }
 
-    train(input_array, target_array) {
+    //TODO: adapt to multi hidden layers
+    /*train(input_array, target_array) {
         // Generating the Hidden Outputs
         const inputs = Matrix.fromArray(input_array);
         const hidden = Matrix.multiply(this.weights_ih, inputs);
@@ -134,36 +115,35 @@ class NeuralNetwork {
         this.weights_ih.add(weight_ih_deltas);
         // Adjust the bias by its deltas (which is just the gradients)
         this.bias_h.add(hidden_gradient);
-    }
+    }*/
 
     serialize() {
         return JSON.stringify(this);
     }
 
     static deserialize(data) {
-        if (typeof data == 'string')
+        if (typeof data === 'string')
             data = JSON.parse(data);
 
-        const nn = new NeuralNetwork(data.input_nodes, data.hidden_nodes, data.output_nodes);
-        nn.weights_ih = Matrix.deserialize(data.weights_ih);
-        nn.weights_ho = Matrix.deserialize(data.weights_ho);
-        nn.bias_h = Matrix.deserialize(data.bias_h);
-        nn.bias_o = Matrix.deserialize(data.bias_o);
-        nn.learning_rate = data.learning_rate;
+        const nn = new NeuralNetwork(data.info);
+        nn.weights = Matrix.deserialize(data.weights);
+        nn.bias = Matrix.deserialize(data.bias);
+        nn.setLearningRate(data.learning_rate);
+        nn.setActivationFunction(data.activation_function);
         return nn;
     }
 
-    // Adding function for neuro-evolution
     copy() {
         return new NeuralNetwork(this);
     }
 
     mutate(rate) {
-        [
-            "weights_ih",
-            "weights_ho",
-            "bias_h",
-            "bias_o"
-        ].forEach(o => this[o].map(val => val + (Math.random() < rate ? randomGaussian(0, 0.1) : 0)));
+        [this.weights, this.bias].forEach(w => {
+            w.forEach(m => {
+                m.map(val => {
+                    return val + (Math.random() < rate ? randomGaussian(0, 0.1) : 0);
+                })
+            })
+        });
     }
 }

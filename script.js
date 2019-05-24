@@ -28,9 +28,11 @@ const nbBirds = 200, // Density of population
     learningRate = 0.1;
 
 // BirdBrain
-const input_nodes = 6, // => see think method
-    hidden_nodes = 8, // Tweakable
-    output_nodes = 2; // Jump or NoJump
+// 6 inputs => see think method
+// 1 hidden layers
+// 8 hidden => Tweakable
+// 2 outputs =>  Jump or NoJump
+const nodes = [6, 8, 2];
 
 // End options
 //---------------------------------------------------------------------
@@ -38,6 +40,7 @@ const input_nodes = 6, // => see think method
 const game = getCanvas('game', {
     pausedSpeed: 0,
     speed: 1,
+    maxSpeed: Number($("input#speed")[0].max),
     adapSpeed: true,
     changeSpeed: (opt, s) => {
         $("input#speed")[0].value = "" + s;
@@ -55,14 +58,12 @@ const game = getCanvas('game', {
     }
 });
 const neu = getCanvas('neurons', {
-    textLeftPadding: 5,
-    nodes: [input_nodes, hidden_nodes, output_nodes],
+    textLeftPadding: 60,
     labels: [
         ["Y", "vY", "PtY", "PbY", "PdX", "PdW"],
-        ["Up", "NoUp"]
+        ["Jump", "NoJump"]
     ],
-    colorOver: 'aqua',
-    colorConnection: 'rgba(0,0,0,0.5)',
+    colorOver: '#00FFFF',
     floatPrecision: 4,
     mutationRate: mutationRate,
     coor: [-1, -1],
@@ -120,7 +121,7 @@ let background, bird, pipes, ground, roof;
 // Stats...
 let gen = 1,
     bestScore = 0,
-    bestBrainYet = new NeuralNetwork(input_nodes, hidden_nodes, output_nodes),
+    bestBrainYet = new NeuralNetwork(nodes),
     bestScoreYet = 0,
     nbAlive = 0;
 
@@ -134,11 +135,12 @@ window.onload = _ => {
     s.oninput = e => {
         game.speed = e.target.valueAsNumber;
         $('legend#speed').html(`Speed: ${game.speed}`);
+        s.disabled = game.adapSpeed;
     };
 
     const as = $('input#adapSpeed')[0];
     as.checked = game.adapSpeed;
-    as.onchange = e => s.disabled = game.adapSpeed = e.target.checked;
+    as.onchange = e => game.adapSpeed = e.target.checked;
 
     let draw_loop, move_loop;
     if (humanGame) {
@@ -165,11 +167,11 @@ window.onload = _ => {
         } else
             hf++;
 
-        if (game.adapSpeed)
+        if (game.adapSpeed && !humanGame && game.speed !== 0)
             if (delta < 1e3 / threshold) {
-                if (game.speed < 100)
+                if (game.speed < game.maxSpeed)
                     game.changeSpeed(game.speed + 1);
-            } else { //if (delta * 0.8 > 1 / threshold * 0.8) {
+            } else {
                 if (game.speed > 1)
                     game.changeSpeed(game.speed - 1);
             }
