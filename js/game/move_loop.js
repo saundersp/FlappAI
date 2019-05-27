@@ -38,6 +38,7 @@ function simulation_loop_move(keyInput, game, delta) {
         speed,
         maxSpeed,
         adapSpeed,
+        toggleAdapSpeed,
         changeSpeed
     } = game;
 
@@ -53,6 +54,12 @@ function simulation_loop_move(keyInput, game, delta) {
             keyInput.ArrowLeft = false;
         }
     }
+
+    if (keyInput.ArrowDown) {
+        toggleAdapSpeed();
+        keyInput.ArrowDown = false;
+    }
+
     if (keyInput.KeyS) {
         saveBlobAsFile("bestBrainYet.json", bestBrainYet.serialize());
         keyInput.KeyS = false;

@@ -47,7 +47,10 @@ const game = getCanvas('game', {
         opt.speed = s;
         $('legend#speed').html(`Speed: ${opt.speed}`);
     },
-    togglePause: (opt) => {
+    toggleAdapSpeed: opt => {
+        $('input#adapSpeed')[0].checked = opt.adapSpeed = !opt.adapSpeed;
+    },
+    togglePause: opt => {
         if (opt.speed !== 0) {
             opt.pausedSpeed = opt.speed;
             opt.changeSpeed(0);
@@ -111,7 +114,7 @@ function getCanvas(name, opt) {
     return res;
 }
 
-const keyInput = trackKeys(['ArrowUp', 'ArrowLeft', 'ArrowRight', 'KeyS', 'KeyG', 'Space']);
+const keyInput = trackKeys(['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'KeyS', 'KeyG', 'Space']);
 
 let fps = 0;
 
