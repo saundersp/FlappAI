@@ -1,14 +1,8 @@
 class BirdBrain extends Bird {
     constructor(img, brain) {
         super(img);
-
         this.fitness = 0;
-        if (brain)
-            this.brain = brain.copy();
-        else {
-            this.brain = new NeuralNetwork(nodes);
-            this.brain.setLearningRate(learningRate);
-        }
+        this.brain = brain ? brain.copy() : new NeuralNetwork(nodes);
     }
 
     move(delta, pipes) {

@@ -3,18 +3,18 @@
 // Enable classic game playable by human
 const humanGame = false;
 // Enable faster graphics (no images just ugly rectangles)
-const fastGraphics = false;
+const fastGraphics = true;
 
 // Bird
-const gravity = 40,
-    speedY = 600;
+const gravity = 40;
+const speedY = 600;
 
 // Pipe
-const space = 180, // Space between top and bottom pipe
-    spaceBetweenPipes = 350,
-    pipe_speed = 300, // Horizontal speed
-    offset = 1.5, // Level of height tolerance
-    pipe_width = 50;
+const space = 180; // Space between top and bottom pipe
+const spaceBetweenPipes = 350;
+const pipe_speed = 300; // Horizontal speed
+const offset = 1.5; // Level of height tolerance
+const pipe_width = 50;
 
 const stat = getCanvas('graph', {
     showN: 20, // Show last 20 scores
@@ -23,16 +23,15 @@ const stat = getCanvas('graph', {
 });
 
 // Options AI (neat)
-const nbBirds = 200, // Density of population
-    mutationRate = 0.25,
-    learningRate = 0.1;
+const nbBirds = 200; // Density of population
+const mutationRate = 0.3;
 
 // BirdBrain
 // 6 inputs => see think method
 // 1 hidden layers
 // 8 hidden => Tweakable
 // 2 outputs =>  Jump or NoJump
-const nodes = [6, 8, 2];
+const nodes = [6, 4, 2];
 
 // End options
 //---------------------------------------------------------------------
@@ -119,11 +118,11 @@ let fps = 0;
 let background, bird, pipes, ground, roof;
 
 // Stats...
-let gen = 1,
-    bestScore = 0,
-    bestBrainYet = new NeuralNetwork(nodes),
-    bestScoreYet = 0,
-    nbAlive = 0;
+let gen = 1;
+let bestScore = 0;
+let bestBrainYet = new NeuralNetwork(nodes);
+let bestScoreYet = 0;
+let nbAlive = 0;
 
 const threshold = 50;
 
@@ -151,9 +150,9 @@ window.onload = _ => {
         move_loop = simulation_loop_move;
     }
 
-    let oldTime = 0,
-        ccfps = 0,
-        hf = 0;
+    let oldTime = 0;
+    let ccfps = 0;
+    let hf = 0;
 
     const loop = currentTime => {
         const delta = currentTime - oldTime;
@@ -203,11 +202,7 @@ function game_setup(width, height) {
     if (humanGame)
         bird = new Bird();
     else
-        bird = generateArray(nbBirds).map(_ => {
-            const b = new BirdBrain();
-            b.brain.setLearningRate(learningRate);
-            return b;
-        });
+        bird = generateArray(nbBirds).map(_ => new BirdBrain());
 
     pipes = generateArray(2).map((_, i) => new Pipe(width + i * spaceBetweenPipes, height));
 

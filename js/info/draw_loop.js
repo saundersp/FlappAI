@@ -26,14 +26,12 @@ function draw_neurons(neurons, bestBrainYet) {
     const {
         info,
         weights,
-        bias,
-        learning_rate
+        bias
     } = bestBrainYet;
 
     ctx.textAlign = 'left';
     ctx.font = "18px arial";
     ctx.fillStyle = 'black';
-    ctx.fillText(`Learning rate: ${learning_rate}`, 10, height - 12);
     ctx.fillText(`Mutation rate: ${mutationRate}`, width - 160, height - 12);
 
     ctx.font = "13px arial";
