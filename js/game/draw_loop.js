@@ -2,7 +2,8 @@ function common_loop_draw(game) {
     const {
         ctx,
         width,
-        height
+        height,
+        fast_graphics
     } = game;
 
     ctx.clearRect(0, 0, width, height);
@@ -10,8 +11,9 @@ function common_loop_draw(game) {
     ctx.font = "25px arial";
 
     background.draw(ctx);
-    pipes.forEach(o => o.draw(ctx));
+    pipes.forEach(o => o.draw(ctx, fast_graphics));
     ground.draw(ctx);
+    roof.draw(ctx);
 
     ctx.fillStyle = 'black';
     ctx.fillText(`FPS: ${fps}`, 10, height - 10);
@@ -23,7 +25,7 @@ function humain_loop_draw(game) {
         ctx
     } = game;
 
-    ctx.fillText(`Score: ${bird.score.toLocaleString()}`, 10, 30);
+    ctx.fillText(`Score: ${bird.score.toLocaleString()}`, 10, 25);
 
     bird.draw(ctx);
 }
@@ -35,14 +37,14 @@ function simulation_loop_draw(game) {
         height
     } = game;
 
-    ctx.fillText(`nbAlive: ${nbAlive}`, 440, height - 10);
+    ctx.fillText(`Left alive: ${nbAlive}`, 430, height - 10);
 
     bird.forEach(bird => {
         if (!bird.dead)
             bird.draw(ctx);
     });
 
-    ctx.fillText(`Score: ${bestScore.toLocaleString()}`, 10, 30);
+    ctx.fillText(`Score: ${bestScore.toLocaleString()}`, 10, 25);
 }
 
 function resetGame(width) {

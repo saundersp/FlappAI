@@ -4,6 +4,7 @@ function draw_neurons(neurons, bestBrainYet) {
         width,
         height,
         textLeftPadding,
+        populationSize,
         mutationRate,
         labels,
         coor,
@@ -32,6 +33,7 @@ function draw_neurons(neurons, bestBrainYet) {
     ctx.textAlign = 'left';
     ctx.font = "18px arial";
     ctx.fillStyle = 'black';
+    ctx.fillText(`Population Size: ${populationSize}`, 20, height - 12);
     ctx.fillText(`Mutation rate: ${mutationRate}`, width - 160, height - 12);
 
     ctx.font = "13px arial";
@@ -89,7 +91,7 @@ function draw_neurons(neurons, bestBrainYet) {
             ctx.fill();
             ctx.stroke();
 
-            //Drawing weight
+            //Drawing labels or biases
             ctx.fillStyle = 'black';
             switch (i) {
                 case 0: // inputs
@@ -97,10 +99,8 @@ function draw_neurons(neurons, bestBrainYet) {
                     break;
 
                 case info.length - 1: // outputs
-                    ctx.fillText(bias[i - 1].data[j - 1][0].toFixed(floatPrecision), x, nY);
-                    ctx.fillStyle = 'black';
                     ctx.fillText(labels[1][j - 1], x + textLeftPadding, nY);
-                    break;
+                    // No break statement to draw biases
 
                 default: // hidden
                     ctx.fillText(bias[i - 1].data[j - 1][0].toFixed(floatPrecision), x, nY);
@@ -114,14 +114,16 @@ function strokeLineText(ctx, strokeColor, text, x, y, nX, nY) {
     const disV = [
         x + (nX - x) / 2,
         y + (nY - y) / 2
-    ];
+    ]; // Point betwwen (x, y) and (nX, nY)
 
+    // Draw connection
     ctx.beginPath();
     ctx.moveTo(x, y);
     ctx.lineTo(nX, nY);
     ctx.strokeStyle = strokeColor + '88';
     ctx.stroke();
 
+    // Draw rotated text weight
     ctx.save();
     ctx.translate(...disV);
     ctx.rotate(Math.atan2(nY - y, nX - x));
@@ -150,13 +152,11 @@ function draw_graph(stat, tabscore) {
     let first, len;
     if (tabscore.length < showN) {
         first = 0;
-        len = tabscore.length;
+        len = tabscore.length - 1;
     } else {
         first = tabscore.length - showN;
-        len = showN;
+        len = showN - 1;
     }
-
-    len--;
 
     let {
         avg,

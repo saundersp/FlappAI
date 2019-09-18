@@ -9,10 +9,10 @@ class Pipe extends Rectangle {
         this.speedX = pipe_speed;
     }
 
-    draw(ctx) {
+    draw(ctx, fast_graphics) {
         super.draw(ctx);
         this.bottomPipe.draw(ctx);
-        if (fastGraphics)
+        if (fast_graphics)
             if (!this.barrier.broke)
                 this.barrier.draw(ctx);
     }

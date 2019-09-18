@@ -2,8 +2,6 @@
 // Options you can tweak
 // Enable classic game playable by human
 const humanGame = false;
-// Enable faster graphics (no images just ugly rectangles)
-const fastGraphics = true;
 
 // Bird
 const gravity = 40;
@@ -16,6 +14,9 @@ const pipe_speed = 300; // Horizontal speed
 const offset = 1.5; // Level of height tolerance
 const pipe_width = 50;
 
+// Roof and bottom height
+const borderSize = 50;
+
 const stat = getCanvas('graph', {
     showN: 20, // Show last 20 scores
     lineWidth: 1.2,
@@ -27,20 +28,21 @@ const nbBirds = 200; // Density of population
 const mutationRate = 0.3;
 
 // BirdBrain
-// 6 inputs => see think method
-// 1 hidden layers
-// 8 hidden => Tweakable
-// 2 outputs =>  Jump or NoJump
+// 6 inputs nodes => see BirdBrain.think method
+// 4 hidden nodes => Tweakable (Best result seen with 4)
+// 2 outputs nodes =>  Jump or NoJump
 const nodes = [6, 4, 2];
 
 // End options
 //---------------------------------------------------------------------
 
+//Global game canvas manager
 const game = getCanvas('game', {
     pausedSpeed: 0,
     speed: 1,
     maxSpeed: Number($("input#speed")[0].max),
     adapSpeed: true,
+    fast_graphics: false,
     changeSpeed: (opt, s) => {
         $("input#speed")[0].value = "" + s;
         opt.speed = s;
@@ -59,6 +61,8 @@ const game = getCanvas('game', {
         }
     }
 });
+
+// Global neurons graph canvas manager
 const neu = getCanvas('neurons', {
     textLeftPadding: 60,
     labels: [
@@ -67,6 +71,7 @@ const neu = getCanvas('neurons', {
     ],
     colorOver: '#00FFFF',
     floatPrecision: 4,
+    populationSize: nbBirds,
     mutationRate: mutationRate,
     coor: [-1, -1],
     onmousemove: (opt, e) => {
@@ -82,7 +87,8 @@ const neu = getCanvas('neurons', {
     onmouseleave: opt => opt.coor = [-1, -1]
 });
 
-const tabscore = [];
+// Load assets in memory then giving pointer to objects
+const assets = {};
 
 function getCanvas(name, opt) {
     const canvas = $(`canvas#${name}`)[0];
@@ -127,6 +133,9 @@ let bestBrainYet = new NeuralNetwork(nodes);
 let bestScoreYet = 0;
 let nbAlive = 0;
 
+// Records of all best scores
+const tabscore = [];
+
 const threshold = 50;
 
 window.onload = _ => {
@@ -139,6 +148,26 @@ window.onload = _ => {
         $('legend#speed').html(`Speed: ${game.speed}`);
         s.disabled = game.adapSpeed;
     };
+
+    $('button#toggleFastGraphics').click(obj => {
+        if (game.fast_graphics) {
+            obj.target.innerHTML = 'Enable fast graphics';
+            game.fast_graphics = false;
+            background.img = assets.background;
+            ground.img = roof.img = assets.groundPiece;
+            pipes.forEach(p => {
+                p.img = assets.full_pipe_top;
+                p.bottomPipe.img = assets.full_pipe_bottom;
+            });
+            humanGame ? bird.img = assets.bird : bird.forEach(b => b.img = assets.bird);
+        } else {
+            obj.target.innerHTML = 'Disable fast graphics';
+            game.fast_graphics = true;
+            background.img = ground.img = roof.img = undefined;
+            pipes.forEach(p => p.img = p.bottomPipe.img = undefined);
+            humanGame ? bird.img = undefined : bird.forEach(b => b.img = undefined);
+        }
+    });
 
     const as = $('input#adapSpeed')[0];
     as.checked = game.adapSpeed;
@@ -194,33 +223,41 @@ window.onload = _ => {
 };
 
 function game_setup(width, height) {
+    // Create objects...
     background = new Rectangle(0, 0, width, height, '#00DBFF');
-
-    const borderSize = 50;
-
-    roof = new Rectangle(0, -borderSize, width, borderSize, 'grey');
-
     ground = new Rectangle(0, height - borderSize, width, borderSize, 'yellow');
+    roof = new Rectangle(0, 0, width, borderSize, 'yellow');
+    roof.draw = function (ctx) {
+        ctx.save();
+        ctx.translate(this.x + this.w / 2, this.y + this.h / 2);
+        ctx.rotate(Math.PI);
+        if (this.img)
+            ctx.drawImage(this.img, -this.w / 2, -this.h / 2, this.w, this.h);
+        else {
+            ctx.fillStyle = this.c;
+            ctx.fillRect(-this.w / 2, -this.h / 2, this.w, this.h);
+        }
+        ctx.restore();
+    };
 
-    if (humanGame)
-        bird = new Bird();
-    else
-        bird = generateArray(nbBirds).map(_ => new BirdBrain());
-
+    bird = humanGame ? new Bird() : generateArray(nbBirds).map(_ => new BirdBrain());
     pipes = generateArray(2).map((_, i) => new Pipe(width + i * spaceBetweenPipes, height));
 
-    if (!fastGraphics) {
-        loadImage(background, 'images/background.png');
-        loadImage(ground, 'images/groundPiece.png');
-        pipes.forEach(p => {
-            loadImage(p, 'images/full_pipe_top.png');
-            loadImage(p.bottomPipe, 'images/full_pipe_bottom.png');
-        });
-        if (humanGame)
-            loadImage(bird, 'images/bird.png');
+    load_and_attach('background', background);
+    load_and_attach('groundPiece', [ground, roof]);
+    load_and_attach('bird', bird);
+    load_and_attach('full_pipe_top', pipes);
+    load_and_attach('full_pipe_bottom', pipes.map(p => p.bottomPipe));
+}
+
+function load_and_attach(name, obj) {
+    assets[name] = loadImage(`images/${name}.png`);
+    assets[name].onload = e => {
+        if (obj.forEach)
+            obj.forEach(o => o.img = e.target);
         else
-            bird.forEach(b => loadImage(b, 'images/bird.png'));
-    }
+            obj.img = e.target;
+    };
 }
 
 function saveBlobAsFile(name, content) {
