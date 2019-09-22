@@ -33,10 +33,8 @@ class NeuralNetwork {
             this.weights = [];
             this.bias = [];
             for (let i = 0; i < neurons.length - 1; i++) {
-                this.weights.push(new Matrix(neurons[i + 1], neurons[i]));
-                this.weights[i].randomize();
-                this.bias.push(new Matrix(neurons[i + 1], 1));
-                this.bias[i].randomize();
+                this.weights.push(new Matrix(neurons[i + 1], neurons[i]).randomize());
+                this.bias.push(new Matrix(neurons[i + 1], 1).randomize());
             }
             this.setActivationFunction();
         }
@@ -44,11 +42,11 @@ class NeuralNetwork {
 
     predict(input_array) {
         let last = Matrix.fromArray(input_array);
-        for (let i = 0; i < this.weights.length; i++) {
-            last = Matrix.multiply(this.weights[i], last);
+        this.weights.forEach((w, i) => {
+            last = Matrix.multiply(w, last);
             last.add(this.bias[i]);
             last.map(this.activation_function.func);
-        }
+        });
         return last.toArray();
     }
 

@@ -214,7 +214,7 @@ function draw_graph(stat, tabscore) {
     ctx.stroke();
 
     ctx.fillStyle = 'white';
-    ctx.strokeStyle = 'grey';
+    ctx.strokeStyle = 'black';
     [
         `Generation: ${gen} Average: ${avg.toLocaleString()} Best ever: ${bestScoreYet.toLocaleString()}`,
         `Maximum: ${maxi.toLocaleString()}, Middle: ${moy.toLocaleString()} Minimum: ${mini.toLocaleString()}`

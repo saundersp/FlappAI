@@ -31,6 +31,7 @@ class BirdBrain extends Bird {
 
     mutate() {
         this.brain.mutate(mutationRate);
+        return this;
     }
 
     think(pipes, width, height) {

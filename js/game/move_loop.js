@@ -1,10 +1,3 @@
-function checkControls(keyInput, game) {
-    if (keyInput.Space) {
-        game.togglePause();
-        keyInput.Space = false;
-    }
-}
-
 function common_loop_move(game, delta) {
     pipes.forEach(pipe => {
         pipe.move(delta);
@@ -53,20 +46,6 @@ function simulation_loop_move(keyInput, game, delta) {
                 changeSpeed(speed - 1);
             keyInput.ArrowLeft = false;
         }
-    }
-
-    if (keyInput.ArrowDown) {
-        toggleAdapSpeed();
-        keyInput.ArrowDown = false;
-    }
-
-    if (keyInput.KeyS) {
-        saveBlobAsFile("bestBrainYet.json", bestBrainYet.serialize());
-        keyInput.KeyS = false;
-    }
-    if (keyInput.KeyG) {
-        saveBlobAsFile("tabScore.json", JSON.stringify(tabscore));
-        keyInput.KeyG = false;
     }
 
     nbAlive = bird.reduce((n, bird) => {

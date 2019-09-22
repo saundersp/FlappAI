@@ -40,13 +40,14 @@ const nodes = [6, 4, 2];
 const game = getCanvas('game', {
     pausedSpeed: 0,
     speed: 1,
+    fps_threshold: 50,
     maxSpeed: Number($("input#speed")[0].max),
     adapSpeed: true,
     fast_graphics: false,
     changeSpeed: (opt, s) => {
-        $("input#speed")[0].value = "" + s;
+        $("input#speed")[0].value = String(s);
         opt.speed = s;
-        $('legend#speed').html(`Speed: ${opt.speed}`);
+        $('legend#len_speed').html(`Speed: ${opt.speed}`);
     },
     toggleAdapSpeed: opt => {
         $('input#adapSpeed')[0].checked = opt.adapSpeed = !opt.adapSpeed;
@@ -119,7 +120,7 @@ function getCanvas(name, opt) {
     return res;
 }
 
-const keyInput = trackKeys(['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'KeyS', 'KeyG', 'Space']);
+const keyInput = trackKeys(['ArrowUp', 'ArrowLeft', 'ArrowRight', 'Space']);
 
 let fps = 0;
 
@@ -136,22 +137,22 @@ let nbAlive = 0;
 // Records of all best scores
 const tabscore = [];
 
-const threshold = 50;
-
 window.onload = _ => {
     game_setup(game.width, game.height);
 
-    const s = $("input#speed")[0];
-    s.value = "1";
-    s.oninput = e => {
-        game.speed = e.target.valueAsNumber;
-        $('legend#speed').html(`Speed: ${game.speed}`);
-        s.disabled = game.adapSpeed;
-    };
+    const range_speed = $("input#speed")[0];
+    range_speed.oninput = e => game.changeSpeed(e.target.valueAsNumber);
+    range_speed.disabled = true;
+    const input_fps_threshold = $('input#fps_threshold')[0];
+    input_fps_threshold.oninput = e => game.fps_threshold = e.target.valueAsNumber;
+    input_fps_threshold.valueAsNumber = game.fps_threshold;
+    $('button#save_brain').click(_ => saveBlobAsFile("bestBrainYet.json", bestBrainYet.serialize()));
+    $('button#save_scores').click(_ => saveBlobAsFile("tabScore.json", JSON.stringify(tabscore)));
 
     $('button#toggleFastGraphics').click(obj => {
         if (game.fast_graphics) {
             obj.target.innerHTML = 'Enable fast graphics';
+            obj.target.setAttribute('class', 'btn_disabled');
             game.fast_graphics = false;
             background.img = assets.background;
             ground.img = roof.img = assets.groundPiece;
@@ -162,6 +163,7 @@ window.onload = _ => {
             humanGame ? bird.img = assets.bird : bird.forEach(b => b.img = assets.bird);
         } else {
             obj.target.innerHTML = 'Disable fast graphics';
+            obj.target.setAttribute('class', 'btn_enabled');
             game.fast_graphics = true;
             background.img = ground.img = roof.img = undefined;
             pipes.forEach(p => p.img = p.bottomPipe.img = undefined);
@@ -169,9 +171,20 @@ window.onload = _ => {
         }
     });
 
-    const as = $('input#adapSpeed')[0];
-    as.checked = game.adapSpeed;
-    as.onchange = e => game.adapSpeed = e.target.checked;
+    $('button#toggleAdapSpeed').click(obj => {
+        if (game.adapSpeed) {
+            game.adapSpeed = false;
+            obj.target.innerHTML = 'Enable adaptative speed';
+            obj.target.setAttribute('class', 'btn_disabled');
+            game.changeSpeed(1);
+            range_speed.disabled = false;
+        } else {
+            game.adapSpeed = true;
+            obj.target.innerHTML = 'Disable adaptative speed';
+            obj.target.setAttribute('class', 'btn_enabled');
+            range_speed.disabled = true;
+        }
+    });
 
     let draw_loop, move_loop;
     if (humanGame) {
@@ -192,14 +205,14 @@ window.onload = _ => {
         ccfps += delta;
 
         if (ccfps > 1e3) {
-            ccfps -= 1e3;
+            ccfps %= 1e3;
             fps = hf;
             hf = 0;
         } else
             hf++;
 
         if (game.adapSpeed && !humanGame && game.speed !== 0)
-            if (delta < 1e3 / threshold) {
+            if (delta < 1e3 / game.fps_threshold) {
                 if (game.speed < game.maxSpeed)
                     game.changeSpeed(game.speed + 1);
             } else {
@@ -212,7 +225,6 @@ window.onload = _ => {
             move_loop(keyInput, game, delta);
         }
 
-        checkControls(keyInput, game);
         common_loop_draw(game);
         draw_loop(game);
         draw_neurons(neu, bestBrainYet);

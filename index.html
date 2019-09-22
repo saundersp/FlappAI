@@ -16,44 +16,77 @@
     <style>
         body {
             margin: 0;
+            height: 100%;
+            width: 100%;
+            font-family: 'Lucida', sans-serif;
+            font-size: larger;
         }
 
-        div#info,
-        div#game {
+        canvas#neurons,
+        canvas#graph,
+        canvas#game {
             position: absolute;
-            height: 100%;
             width: 600px;
             padding: 0;
         }
 
-        div#info {
+        canvas#game {
+            height: 800px;
+        }
+
+        canvas#graph,
+        canvas#neurons {
             left: 600px;
+        }
+
+        canvas#graph {
+            top: 400px;
+        }
+
+        div.control_board {
+            position: relative;
+            top: 800px;
+            width: 100%;
+        }
+
+        div.control_board button {
+            height: 35px;
+            font-size: large;
+            background-color: lightgrey;
+        }
+
+        div.control_board input#speed {
+            opacity: 0%;
+        }
+
+        div.control_board button.btn_disabled {
+            /* Maybe add other effects... */
+            background-color: #cacaca;
+        }
+
+        div.control_board button.btn_enabled {
+            background-color: white;
+        }
+
+        div.control_board legend {
+            width: 200px;
         }
     </style>
 </head>
 
 <body>
-    <div id="game">
-        <canvas id="game" width="600" height="800"></canvas>
-        <legend id="speed" for="speed">Speed: 1</legend>
-        <input type="range" id="speed" name="speed" min="0" max="1000" step="1">
-        Adaptative speed
-        <input type="checkbox" id="adapSpeed" name="adapSpeed">
-        <button id="toggleFastGraphics">Enable fast graphics</button>
-        <h3>Space : pause the game</h3>
-        <h3>(Simulation) ArrowDown : toggle adaptative speed</h3>
-        <h3>(Simulation) ArrowLeft : slow down</h3>
-        <h3>(Simulation) ArrowRight : speed up</h3>
-        <h3>(Simulation) S : save best brain</h3>
-        <h3>(Simulation) G : save all the scores</h3>
-    </div>
-    <div id="info">
-        <td>
-            <canvas id="neurons" width="600" height="400"></canvas>
-        </td>
-        <td>
-            <canvas id="graph" width="600" height="400"></canvas>
-        </td>
+    <canvas id="game" width="600" height="800"></canvas>
+    <canvas id="neurons" width="600" height="400"></canvas>
+    <canvas id="graph" width="600" height="400"></canvas>
+    <div class="control_board">
+        <button id="save_brain">Save best brain</button>
+        <button id="save_scores">Save scores</button>
+        <button id="toggleFastGraphics" class="btn_disabled">Enable fast graphics</button>
+        <button id="toggleAdapSpeed" class="btn_enabled">Disable adaptative speed</button>
+        <legend id="len_speed" for="speed">Speed: 1</legend>
+        <input type="range" id="speed" name="speed" min="0" max="1000" step="1" />
+        <legend for="fps_threshold">FPS Minimun:</legend>
+        <input type="number" id="fps_threshold" name="fps_threshold" min="20" max="240" step="1" value="50" />
     </div>
     <script src="script.js"></script>
 </body>

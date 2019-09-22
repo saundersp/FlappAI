@@ -14,21 +14,13 @@ function nextGeneration() {
 
     //calculate fitness
     const sum = bird.reduce((n, b) => n + b.score, 0);
-    bird.forEach(b => b.fitness = b.score / sum);
 
     //Mutation
     bird = bird.map(_ => {
-
-        let index = 0;
-        let r = randomFloat();
-        while (r > 0) {
-            r = r - bird[index].fitness;
-            index++;
-        }
-        index--;
+        let index = -1;
+        for (let r = randomFloat(); r > 0; index++)
+            r -= bird[index + 1].score / sum; //fitness = score / sum
         const cbird = bird[index];
-        const child = new BirdBrain(cbird.img, cbird.brain);
-        child.mutate();
-        return child;
+        return new BirdBrain(cbird.img, cbird.brain).mutate();
     });
 }
