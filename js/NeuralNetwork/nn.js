@@ -98,7 +98,7 @@ class NeuralNetwork {
         [this.weights, this.bias].forEach(w => {
             w.forEach(m => {
                 m.map(val => {
-                    return val + (randomFloat() < rate ? randomGaussian(0, 0.1) : 0);
+                    return val + (randomFloat() < rate ? randomNormal(0, 0.1) : 0);
                 });
             });
         });

@@ -63,6 +63,11 @@ const game = getCanvas('game', {
     }
 });
 
+let keyInput;
+if(humanGame)
+    keyInput = trackKeys(document, ['ArrowUp', 'ArrowLeft', 'ArrowRight', 'Space']);
+
+
 // Global neurons graph canvas manager
 const neu = getCanvas('neurons', {
     textLeftPadding: 60,
@@ -119,8 +124,6 @@ function getCanvas(name, opt) {
         });
     return res;
 }
-
-const keyInput = trackKeys(['ArrowUp', 'ArrowLeft', 'ArrowRight', 'Space']);
 
 let fps = 0;
 
@@ -255,7 +258,7 @@ function game_setup(width, height) {
     bird = humanGame ? new Bird() : generateArray(nbBirds).map(_ => new BirdBrain());
     pipes = generateArray(2).map((_, i) => new Pipe(width + i * spaceBetweenPipes, height));
 
-    load_and_attach('background', background);
+    background.loadImage('images/background.png')
     load_and_attach('groundPiece', [ground, roof]);
     load_and_attach('bird', bird);
     load_and_attach('full_pipe_top', pipes);

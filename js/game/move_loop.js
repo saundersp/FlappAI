@@ -10,43 +10,24 @@ function common_loop_move(game, delta) {
 
 function humain_loop_move(keyInput, game, delta) {
 
-    const width = game.width;
-
     bird.move(delta, pipes);
 
     if (keyInput.ArrowUp)
         bird.flap(delta);
 
+    if (keyInput.Space)
+        game.changeSpeed(0);
+
     if (bird.dead) {
-        resetGame(width);
-        bird = new Bird(bird.img);
+        resetGame(game.width);
+        bestScore = bird.score;
+        nextGeneration();
     }
 }
 
-function simulation_loop_move(keyInput, game, delta) {
+function simulation_loop_move(_, game, delta) {
 
-    const {
-        width,
-        height,
-        speed,
-        maxSpeed,
-        adapSpeed,
-        toggleAdapSpeed,
-        changeSpeed
-    } = game;
-
-    if (!adapSpeed) {
-        if (keyInput.ArrowRight) {
-            if (speed < maxSpeed)
-                changeSpeed(speed + 1);
-            keyInput.ArrowRight = false;
-        }
-        if (keyInput.ArrowLeft) {
-            if (speed > 1)
-                changeSpeed(speed - 1);
-            keyInput.ArrowLeft = false;
-        }
-    }
+    const { width, height } = game;
 
     nbAlive = bird.reduce((n, bird) => {
         if (bird.dead)
