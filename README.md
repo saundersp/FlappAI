@@ -1,5 +1,4 @@
-FlappAI
-=======
+# FlappAI
 
 Neural Network plays Flappy-bird !
 
