@@ -1,90 +1,44 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <title>FlappAI</title>
-    <script src="toolbox.min.js"></script>
-    <script src="js/NeuralNetwork/nn.js"></script>
-    <script src="js/NeuralNetwork/ga.js"></script>
-    <script src="js/NeuralNetwork/matrix.js"></script>
-    <script src="js/game/class/Bird.js"></script>
-    <script src="js/game/class/BirdBrain.js"></script>
-    <script src="js/game/class/Pipe.js"></script>
-    <script src="js/game/draw_loop.js"></script>
-    <script src="js/game/move_loop.js"></script>
-    <script src="js/info/draw_loop.js"></script>
-    <style>
-        body {
-            margin: 0;
-            height: 100%;
-            width: 100%;
-            font-family: 'Lucida', sans-serif;
-            font-size: larger;
-        }
-
-        canvas#neurons,
-        canvas#graph,
-        canvas#game {
-            position: absolute;
-            width: 600px;
-            padding: 0;
-        }
-
-        canvas#game {
-            height: 800px;
-        }
-
-        canvas#graph,
-        canvas#neurons {
-            left: 600px;
-        }
-
-        canvas#graph {
-            top: 400px;
-        }
-
-        div.control_board {
-            position: relative;
-            top: 800px;
-            width: 100%;
-        }
-
-        div.control_board button {
-            height: 35px;
-            font-size: large;
-            background-color: lightgrey;
-        }
-
-        div.control_board button.btn_disabled {
-            /* Maybe add other effects... */
-            background-color: #cacaca;
-        }
-
-        div.control_board button.btn_enabled {
-            background-color: white;
-        }
-
-        div.control_board legend {
-            width: 200px;
-        }
-    </style>
+	<meta charset="UTF-8">
+	<title>FlappAI</title>
+	<script src="toolbox.min.js"></script>
+	<script src="js/NeuralNetwork/nn.js"></script>
+	<script src="js/NeuralNetwork/ga.js"></script>
+	<script src="js/NeuralNetwork/matrix.js"></script>
+	<script src="js/game/class/Bird.js"></script>
+	<script src="js/game/class/BirdBrain.js"></script>
+	<script src="js/game/class/Pipe.js"></script>
+	<script src="js/game/draw_loop.js"></script>
+	<script src="js/game/move_loop.js"></script>
+	<script src="js/info/draw_loop.js"></script>
+	<link rel="stylesheet" href="style.css">
 </head>
 
 <body>
-    <canvas id="game" width="600" height="800"></canvas>
-    <canvas id="neurons" width="600" height="400"></canvas>
-    <canvas id="graph" width="600" height="400"></canvas>
-    <div class="control_board">
-        <button id="save_brain">Save best brain</button>
-        <button id="save_scores">Save scores</button>
-        <button id="toggleFastGraphics" class="btn_disabled">Enable fast graphics</button>
-        <button id="toggleAdapSpeed" class="btn_enabled">Disable adaptative speed</button>
-        <legend id="len_speed" for="speed">Speed: 1</legend>
-        <input type="range" id="speed" name="speed" min="0" max="1000" step="1" />
-        <legend for="fps_threshold">FPS Minimun:</legend>
-        <input type="number" id="fps_threshold" name="fps_threshold" min="20" max="240" step="1" value="50" />
-    </div>
-    <script src="script.js"></script>
+	<div id="game_board">
+		<canvas id="game" width="600" height="800"></canvas>
+		<canvas id="neurons" width="600" height="400"></canvas>
+		<canvas id="graph" width="600" height="400"></canvas>
+		<div class="control_board">
+			<button id="save_brain">Save best brain</button>
+			<button id="load_brain">Load brain</button>
+			<input id="dialog_file" type="file" name="name" />
+			<button id="save_scores">Save scores</button>
+			<button id="toggleFastGraphics">Enable fast graphics</button>
+			<button id="toggleAdapSpeed" class="btn_enabled">Disable adaptative speed</button>
+			<div class="input_legend">
+				<legend id="len_speed" for="speed">Speed: 1</legend>
+				<input class="custom-slider" type="range" id="speed" name="speed" min="0" max="1000" step="1" />
+			</div>
+			<div class="input_legend">
+				<legend for="fps_threshold">FPS Minimun:</legend>
+				<input type="number" id="fps_threshold" name="fps_threshold" min="20" max="240" step="1" value="50" />
+			</div>
+		</div>
+	</div>
+	<script src="js/script.js"></script>
 </body>
 
 </html>
